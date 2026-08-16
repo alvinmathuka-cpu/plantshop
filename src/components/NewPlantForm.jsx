@@ -11,7 +11,7 @@ function NewPlantForm({ onAddPlant }) {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: name === "price" ? parseFloat(value) : value,
+      [name]: value,
     });
   };
 
