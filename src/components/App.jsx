@@ -9,7 +9,10 @@ function App() {
   // Fetch all plants on component mount
   useEffect(() => {
     fetch("http://localhost:6001/plants")
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) throw new Error("Unable to load plants");
+        return response.json();
+      })
       .then((data) => setPlants(data));
   }, []);
 
@@ -22,8 +25,11 @@ function App() {
       },
       body: JSON.stringify(newPlant),
     })
-      .then((response) => response.json())
-      .then((data) => setPlants([...plants, data]));
+      .then((response) => {
+        if (!response.ok) throw new Error("Unable to create plant");
+        return response.json();
+      })
+      .then((data) => setPlants((currentPlants) => [...currentPlants, data]));
   };
 
   // Mark plant as sold out
@@ -35,9 +41,13 @@ function App() {
       },
       body: JSON.stringify({ isOutOfStock: true }),
     })
-      .then((response) => response.json())
-      .then((updatedPlant) => {
-        setPlants(plants.map((plant) => (plant.id === id ? updatedPlant : plant)));
+      .then((response) => {
+        if (!response.ok) throw new Error("Unable to update plant");
+        setPlants((currentPlants) =>
+          currentPlants.map((plant) =>
+            plant.id === id ? { ...plant, isOutOfStock: true } : plant
+          )
+        );
       });
   };
 
